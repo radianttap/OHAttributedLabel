@@ -162,6 +162,44 @@
 	CFRelease(aStyle);
 }
 
+
+
+
+
+- (void)drawTextInRect:(CGRect)aRect withinRect:(CGRect)aContainerRect {
+	CGContextRef ctx = UIGraphicsGetCurrentContext();
+	CGContextSaveGState(ctx);
+	
+	// flipping the context to draw core text
+	// no need to flip our typographical bounds from now on
+	CGContextConcatCTM(ctx, CGAffineTransformScale(CGAffineTransformMakeTranslation(0, aContainerRect.size.height), 1.f, -1.f));
+	
+	CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)self);
+	CGRect drawingRect = aRect;
+/*
+	CGSize sz = CTFramesetterSuggestFrameSizeWithConstraints(framesetter,CFRangeMake(0,0),NULL,CGSizeMake(drawingRect.size.width,CGFLOAT_MAX),NULL);
+
+	//	extend bottom to fit
+	CGFloat delta = MAX(0.f , ceilf(sz.height - drawingRect.size.height)) + 10; // Security margin
+	drawingRect.origin.y -= delta;
+	drawingRect.size.height += delta;
+
+	//	center vertically
+	drawingRect.origin.y -= (drawingRect.size.height - sz.height)/2;
+*/
+	CGMutablePathRef path = CGPathCreateMutable();
+	CGPathAddRect(path, NULL, drawingRect);
+	CTFrameRef textFrame = CTFramesetterCreateFrame(framesetter,CFRangeMake(0,0), path, NULL);
+	CGPathRelease(path);
+	CFRelease(framesetter);
+	
+	CTFrameDraw(textFrame, ctx);
+	
+	CGContextRestoreGState(ctx);
+}
+
+
+
 @end
 
 

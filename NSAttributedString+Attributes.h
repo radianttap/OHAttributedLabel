@@ -76,3 +76,7 @@
 @end
 
 
+
+@interface NSMutableAttributedString (RadiantTap)
+- (void)drawTextInRect:(CGRect)aRect withinRect:(CGRect)aContainerRect;
+@end
